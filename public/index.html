@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#001751" />
+  <meta name="description" content="Acphix is a Sri Lanka-based creative and technology studio for digital products, branding, marketing, motion design and AI automation." />
+  <meta property="og:title" content="Acphix — Designing Innovation, Empowering Technology." />
+  <meta property="og:description" content="We design what’s next. Creative, technology and growth under one roof." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/assets/acphix-og.jpg" />
+  <link rel="icon" href="/assets/favicon.png" type="image/png" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/reference-v3.css" />
+  <link rel="stylesheet" href="/light-theme.css" />
+  <title>Acphix — Creative × Technology Studio</title>
+</head>
+<body>
+  <div class="ambient-field" aria-hidden="true"><div class="amb-orb orb-one"></div><div class="amb-orb orb-two"></div><div class="amb-orb orb-three"></div><div class="amb-grid"></div><div class="amb-pointer"></div><div class="amb-star star-1"></div><div class="amb-star star-2"></div><div class="amb-star star-3"></div></div>
+  <div class="ambient-dock" aria-hidden="true"><span class="ambient-dock-icon">✦</span><span><b>ACPHIX / STUDIO</b><small>Design in motion</small></span><i></i></div>
+  <div class="site-shell">
+
+    <span id="announcement-text" hidden></span>
+    <header class="header" id="header">
+      <a href="#/" class="logo-wrap" aria-label="Acphix home"><img src="/assets/acphix-white.png" alt="acphix" class="site-logo" /></a>
+      <nav class="nav" id="desktop-nav" aria-label="Main navigation">
+        <a href="#/" data-nav="home">Home</a><a href="#/about" data-nav="about">About us</a><a href="#/services" data-nav="services">Services</a><a href="#/portfolio" data-nav="portfolio">Portfolio</a><a href="#/careers" data-nav="careers">Careers</a><a href="#/contact" data-nav="contact">Contact us</a>
+      </nav>
+      <div class="header-right"><button class="theme-switch" id="theme-switch" type="button" aria-label="Switch to light mode" title="Switch to light mode"><span class="theme-switch-track"><span class="theme-switch-thumb"></span><span class="theme-switch-icon moon" aria-hidden="true">☾</span><span class="theme-switch-icon sun" aria-hidden="true">☀</span></span></button><button class="icon-button notification-trigger" id="bell" aria-label="Notifications" hidden><span class="icon-target" data-icon="bell"></span><span class="count-bubble" id="unread-count" hidden>0</span></button><a class="nav-login" id="account-link" href="#/login" aria-label="Account">Login</a><a href="#/contact" class="header-cta">Start a project <span>↗</span></a><button class="mobile-toggle" id="mobile-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button></div>
+    </header>
+    <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile navigation" hidden>
+      <a href="#/">Home</a><a href="#/about">About us</a><a href="#/services">Services</a><a href="#/portfolio">Portfolio</a><a href="#/careers">Careers</a><a href="#/contact">Contact</a><a href="#/login">Client portal</a>
+    </nav>
+    <main id="app" tabindex="-1"></main>
+    <footer id="footer" class="footer"></footer>
+  </div>
+  <a class="global-request-fab" href="#/contact" aria-label="Request a service"><span aria-hidden="true">＋</span> Request a service</a>
+  <div id="toast-region" role="status" aria-live="polite" class="toast-region"></div>
+  <div id="modal-root"></div>
+  <script defer src="/app.js"></script>
+</body>
+</html>

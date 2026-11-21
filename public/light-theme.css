@@ -1,0 +1,186 @@
+/* The base styles own layout and motion. Light mode only paints those surfaces. */
+body.light-theme {
+  color-scheme: light;
+  --light-ink: #001751;
+  --light-muted: #475980;
+  --light-blue: #08409c;
+  --light-violet: #2c2870;
+  --light-gold: #ffc200;
+  --light-wash: #edf3ff;
+  --light-line: #cbd8ef;
+  --light-glass: linear-gradient(135deg, #ffffffed, #edf3ffcf);
+  --light-shadow: 0 14px 36px #00175116;
+  background: #f7f9ff;
+  color: var(--light-ink);
+}
+
+.light-theme .ambient-field {
+  background: radial-gradient(ellipse at 84% 12%, #dbe8ff, transparent 55%),
+    radial-gradient(ellipse at 0 56%, #eeebfb, transparent 48%), #f7f9ff;
+}
+.light-theme .amb-star { background: #a2bdec; box-shadow: 0 0 15px #a2bdec; }
+.light-theme .ambient-dock,
+.light-theme :is(.header, .header.stuck, .header.solid, .mobile-menu) {
+  background: var(--light-glass);
+  color: var(--light-ink);
+  border-color: var(--light-line);
+  box-shadow: var(--light-shadow);
+}
+.light-theme :is(.site-logo, .footer-logo) { content: url('/assets/acphix-navy.png'); }
+.light-theme :is(.nav > a, .ambient-dock small) { color: var(--light-muted); }
+.light-theme .nav > a:is(.active, :hover) { background: #dce8ff; color: var(--light-blue); }
+.light-theme .mobile-menu a { border-color: var(--light-line); }
+.light-theme :is(.mobile-menu a, .notification-trigger) { color: var(--light-ink); }
+.light-theme :is(.theme-switch, .mobile-toggle) { background: var(--light-wash); border-color: var(--light-line); }
+.light-theme .mobile-toggle span { background: var(--light-ink); }
+.light-theme .ambient-dock i { background: var(--light-gold); box-shadow: 0 0 9px #ffc265; }
+
+.light-theme :is(.hero.ref-hero, .page-hero, .case-hero, .reach-section) {
+  color: var(--light-ink);
+  background: radial-gradient(ellipse at 82% 25%, #dfeaffae, transparent 62%),
+    linear-gradient(135deg, #ffffffa6, #f2efff99);
+}
+.light-theme .ref-hero::before { background: radial-gradient(circle at 75% 38%, #b6cefa5c, transparent 45%); }
+.light-theme .ref-hero .hero-floor { background: linear-gradient(transparent, #edf3ff8c); }
+.light-theme .stack-panel {
+  background: linear-gradient(145deg, #fffffff2, #e4edffdd 44%, #ccdafaaf 74%, #f5f3ffef);
+  color: var(--light-ink);
+  border-color: #ffffffed;
+  box-shadow: inset 0 2px 0 #fff, inset -2px -5px 24px #688bd226, 0 26px 48px #00175130;
+}
+.light-theme .stack-panel::after { border-color: #08409c1f; }
+.light-theme .stack-panel b { text-shadow: none; }
+.light-theme :is(.panel-topline, .panel-caption, .gadget-sub) { color: var(--light-muted); }
+.light-theme .panel-symbol { color: var(--light-violet); }
+.light-theme .scene-gadget {
+  background: #f7faffde;
+  color: var(--light-ink);
+  border-color: var(--light-line);
+  box-shadow: var(--light-shadow);
+}
+.light-theme .scene-halo { border-color: #08409c24; }
+
+.light-theme :is(.metrics-section, .metric-value, .section, .section-head .section-heading,
+  .section-head h2, .section-heading, .ref-hero h1, .page-hero h1, .case-hero h1,
+  .work-card h3, .service-card h3, .service-detail-card h3, .pricing-card strong,
+  .value-card h3, .step-card h3, .career-card h3, .empty-state h3, .contact-intro h2, .contact-card h3,
+  .form-panel h3, .quote-lines, .case-columns h2, .case-meta dd, .case-next a,
+  .manifesto-copy .line-list, .contact-detail, .footer-col h4, .footer-bottom b) {
+  color: var(--light-ink);
+}
+.light-theme :is(.ref-hero .hero-description, .section-intro, .metric-title, .metric-footnote,
+  .work-card > p, .manifesto-copy p, .service-card p, .service-detail-card p,
+  .step-card p, .value-card p, .career-card p, .empty-state p, .about-text, .about-lead,
+  .contact-intro > p, .reach-copy > p, .reach-small, .map-note, .map-note-right,
+  .art-label, .art-serial, .step-no, .pricing-card .pricing-bottom span,
+  .pricing-card .price-category, .pricing-card .price-num small, .notice,
+  .service-card .card-category, .service-detail-card .service-top span, .case-columns p,
+  .case-meta dt, .page-hero p, .case-hero p, .page-hero .page-code,
+  .contact-detail-label, .dark-panel p, .contact-card p, .form-hint,
+  .footer-col a, .footer-col span, .footer-tagline, .footer-bottom) {
+  color: var(--light-muted);
+}
+.light-theme :is(.about-text, .about-lead, .contact-intro > p, .reach-small) {
+  color: var(--light-muted) !important;
+}
+.light-theme :is(.section-heading em, .page-hero h1 em, .eyebrow, .eyebrow.gold,
+  .work-category, .text-link, .service-detail-price, .line-list b, .reach-period,
+  .metric-icon, .ribbon-lead), .light-theme .ribbon-items span::before {
+  color: var(--light-blue);
+}
+
+.light-theme :is(.services-section, .manifesto-section, .work-section, .steps-section, .pricing-section) {
+  background: linear-gradient(145deg, #ffffff9c, #edf3ff79);
+}
+body.light-theme[data-page] #app > .section[style*="background"] {
+  background: #f5f7ff !important;
+}
+body.light-theme[data-page] #app > .section { color: var(--light-ink); }
+.light-theme :is(.metric-grid, .service-card, .service-detail-card, .pricing-card, .value-card,
+  .step-card, .career-card, .contact-card, .form-panel, .map-glass, .dark-panel, .empty-state) {
+  background: var(--light-glass);
+  color: var(--light-ink);
+  border-color: var(--light-line);
+  box-shadow: var(--light-shadow);
+}
+/* Match the base stylesheet's existing important surface declarations. */
+.light-theme :is(.service-card, .service-detail-card, .value-card, .contact-card, .career-card, .pricing-card) {
+  background: var(--light-glass) !important;
+  border-color: var(--light-line) !important;
+  box-shadow: var(--light-shadow) !important;
+}
+.light-theme .service-card.featured {
+  background: linear-gradient(135deg, #f5f3ff, #e7efff) !important;
+}
+.light-theme :is(.metric-card, .pricing-card .pricing-bottom, .card-bottom, .manifesto-copy .line-list > div,
+  .case-meta, .case-next, .footer-bottom) { border-color: var(--light-line); }
+.light-theme :is(.service-card .service-icon, .service-detail-card .service-icon, .pricing-card-icon,
+  .value-icon, .round-arrow, .pricing-card .pricing-bottom a, .contact-card .service-icon, .reach-tags span) {
+  background: #e4edff !important;
+  color: var(--light-blue) !important;
+  border-color: #c4d6f5;
+}
+.light-theme :is(.service-card, .service-detail-card, .pricing-card, .value-card, .map-glass):hover {
+  border-color: #91abe0 !important;
+  box-shadow: 0 20px 44px #00175122 !important;
+}
+.light-theme .pricing-card strong { color: var(--light-ink) !important; }
+.light-theme .pricing-card .price-num { color: var(--light-blue) !important; }
+.light-theme :is(.pricing-card .price-category, .pricing-card .price-num small, .notice) {
+  color: var(--light-muted) !important;
+}
+.light-theme .pricing-card .pricing-bottom { border-color: var(--light-line) !important; }
+.light-theme .manifesto-art {
+  background: linear-gradient(145deg, #f4f1ff, #dce9ff);
+  border-color: var(--light-line);
+  box-shadow: var(--light-shadow);
+}
+.light-theme .work-image { box-shadow: var(--light-shadow); }
+.light-theme .work-hover-action { background: var(--light-glass); color: var(--light-ink); }
+.light-theme .work-image:hover .work-hover-action { background: var(--light-gold); color: var(--light-ink); }
+.light-theme .worldmap image { filter: brightness(.75) saturate(1.35); }
+.light-theme .worldmap .pin-core { fill: var(--light-blue); stroke: white; filter: none; }
+.light-theme .worldmap .pin-wave { fill: var(--light-violet); }
+.light-theme .step-line { background: var(--light-line); }
+.light-theme .step-line::after { border-color: var(--light-blue); background: var(--light-wash); }
+
+.light-theme .ribbon { background: #e4edff; color: var(--light-ink); }
+.light-theme .ribbon-items span { color: var(--light-violet); }
+.light-theme :is(.btn-line, .ref-hero .btn-line, .filter-btn) {
+  background: #ffffffc9;
+  border-color: #95abd2;
+  color: var(--light-ink);
+}
+.light-theme :is(.btn-line, .ref-hero .btn-line):hover { background: #e4edff; color: var(--light-blue); }
+.light-theme .filter-btn:is(.active, :hover) {
+  background: var(--light-gold);
+  border-color: var(--light-gold);
+  color: var(--light-ink);
+}
+.light-theme[data-page="contact"] .field label { color: var(--light-ink); }
+.light-theme[data-page="contact"] .field :is(input, textarea, select) {
+  background: #fff;
+  color: var(--light-ink);
+  border-color: #95abd2;
+}
+.light-theme[data-page="contact"] .field :is(input, textarea)::placeholder { color: var(--light-muted); }
+.light-theme :is(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--light-blue);
+}
+
+.light-theme .cta-band {
+  background: linear-gradient(120deg, #dce9ff, #ece9fa);
+  color: var(--light-ink);
+}
+.light-theme .cta-band p { color: var(--light-muted); }
+.light-theme .case-hero a { color: var(--light-blue) !important; }
+.light-theme .footer { background: #edf3ff; color: var(--light-ink); border-color: var(--light-line); }
+.light-theme .footer-socials .social-icon { background: #fff; border-color: var(--light-line); color: var(--light-blue); }
+.light-theme .footer-socials a.social-icon:hover { background: var(--light-gold); border-color: var(--light-gold); }
+.light-theme .global-request-fab { box-shadow: var(--light-shadow); }
+
+body.light-theme[data-page="portfolio"] :is(.case-meta, .case-next) { border-color: var(--light-line); }
+body.light-theme[data-page="portfolio"] :is(.case-meta dd, .case-columns h2, .case-next a, .empty-state h3),
+body.light-theme[data-page="careers"] :is(.career-card h3, .empty-state h3) { color: var(--light-ink); }
+body.light-theme[data-page="portfolio"] :is(.case-meta dt, .case-columns p, .empty-state p),
+body.light-theme[data-page="careers"] :is(.career-card p, .empty-state p) { color: var(--light-muted); }
