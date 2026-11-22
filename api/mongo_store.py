@@ -45,7 +45,6 @@ def migrate_sqlite(database):
     con = sqlite3.connect(path)
     con.row_factory = sqlite3.Row
     tables = {
-        "settings": "site_settings",
         "services": "services",
         "portfolio": "portfolio",
         "requests": "requests",
@@ -54,12 +53,22 @@ def migrate_sqlite(database):
         "notifications": "notifications",
         "users": "users",
     }
+    try:
+        settings = [dict(row) for row in con.execute("SELECT * FROM site_settings")]
+        if settings:
+            database.settings.insert_many(settings, ordered=False)
+    except sqlite3.Error:
+        pass
     for mongo_name, sqlite_name in tables.items():
         try:
+            if mongo_name == "settings":
+                continue
             rows = [dict(row) for row in con.execute(f"SELECT * FROM {sqlite_name}")]
             if rows:
                 for row in rows:
-                    row["_id"] = str(row.pop("id", row.pop("key", uuid.uuid4().hex)))
+                    if mongo_name == "settings":
+                        continue
+                    row["_id"] = str(row.pop("id", uuid.uuid4().hex))
                 database[mongo_name].insert_many(rows, ordered=False)
         except sqlite3.Error:
             pass
