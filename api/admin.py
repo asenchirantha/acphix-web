@@ -251,3 +251,14 @@ async def delete_entity(kind: str, request: Request):
         raise HTTPException(400, "Missing id")
     database[kind].delete_one({"id": rid})
     return {"ok": True}
+
+
+@app.get("/api/admin/record")
+async def admin_record(request: Request, kind: str = "", id: str = ""):
+    database = authorized(request)
+    if kind not in ("services", "portfolio", "jobs", "requests", "applications"):
+        raise HTTPException(400, "Invalid record")
+    row = database[kind].find_one({"id": id}, {"_id": 0})
+    if not row:
+        raise HTTPException(404, "Record not found")
+    return {"record": row}

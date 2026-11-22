@@ -91,7 +91,8 @@ body:has(.dashboard) .ambient-dock,body:has(.login-layout) .ambient-dock{display
 .reach-base{display:flex;align-items:center;gap:10px;margin:29px 0 20px;font-size:11px;font-weight:800;letter-spacing:.1em;color:#dce9ff}.reach-pulse{width:9px;height:9px;background:var(--yellow);border-radius:50%;box-shadow:0 0 0 7px rgba(255,194,0,.12);animation:statusPulse 3s ease-in-out infinite}
 .reach-caption{font-size:10px;letter-spacing:.09em;color:#91aedc}.reach-tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.reach-tags span{padding:8px 12px;border-radius:100px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);font-size:11px;color:#e8f1ff}
 .map-glass{padding:23px;border-radius:31px;min-width:0;background:linear-gradient(160deg,rgba(197,222,255,.13),rgba(139,174,255,.025));box-shadow:0 25px 70px rgba(0,8,38,.25),inset 0 1px 0 rgba(255,255,255,.21)}
-.map-top,.map-bottom{display:flex;justify-content:space-between;gap:12px;align-items:center;font-size:10px;font-weight:800;letter-spacing:.09em;color:#a4c3f5}.map-indicator{display:flex;gap:8px;align-items:center}.map-indicator i,.map-bottom i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--yellow);box-shadow:0 0 15px rgba(255,194,0,.5)}.worldmap{display:block;width:100%;margin:22px 0;filter:drop-shadow(0 0 18px rgba(124,165,255,.14));overflow:visible}.map-client-pin{filter:drop-shadow(0 0 13px rgba(255,194,0,.6));animation:mapPin 3.8s ease-in-out infinite alternate}.map-hq-pin{filter:drop-shadow(0 0 14px rgba(255,194,0,.9));animation:mapPin 2.8s ease-in-out infinite alternate}
+.map-top,.map-bottom{display:flex;justify-content:space-between;gap:12px;align-items:center;font-size:10px;font-weight:800;letter-spacing:.09em;color:#a4c3f5}.map-indicator{display:flex;gap:8px;align-items:center}.map-indicator i,.map-bottom i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--yellow);box-shadow:0 0 15px rgba(255,194,0,.5)}.worldmap{display:block;width:100%;margin:22px 0;filter:drop-shadow(0 0 18px rgba(124,165,255,.14));overflow:visible}.map-client-pin{filter:drop-shadow(0 0 13px rgba(255,194,0,.6));animation:mapPin 3.8s ease-in-out infinite alternate}.map-hq-pin{filter:drop-shadow(0 0 14px rgba(255,194,0,.9));
+animation:mapPin 3.8s ease-in-out infinite alternate}
 @keyframes mapPin{to{opacity:.55;filter:drop-shadow(0 0 23px rgba(255,194,0,.9))}}
 /* Material 3 shape, spacing and subtly translucent card surfaces */
 .service-grid{gap:var(--m3-space-2)}.service-card{border-radius:23px;background:linear-gradient(150deg,rgba(255,255,255,.94),rgba(229,237,253,.65));box-shadow:0 13px 34px rgba(16,47,101,.045),inset 0 1px 0 rgba(255,255,255,.75)}.service-card:hover{box-shadow:0 26px 52px rgba(19,50,120,.1);transform:translateY(-7px)}
@@ -198,22 +199,5 @@ body:not(.light-theme) .toggle-wrap{color:#c3d3ee}
 body:not(.light-theme) .price-action-bar{border-color:rgba(213,230,255,.14)}
 body:not(.light-theme) .price-action-bar p,body:not(.light-theme) .form-hint{color:#9fb6df}
 
-@media(max-width:700px){
-  .header{left:10px;right:10px;top:10px;padding:0 12px 0 16px;height:62px}
-  .header.stuck{left:10px;right:10px;top:10px}
-  .theme-switch{width:54px;height:34px}.theme-switch-track{width:54px;height:34px}.theme-switch-thumb{width:24px;height:24px}.theme-switch-icon{font-size:13px}.theme-switch-icon.moon{left:10px}.theme-switch-icon.sun{right:9px}body.light-theme .theme-switch-thumb{transform:translateX(20px)}
-  .nav-login{display:none}
-}
-
-/* Existing-record editing cues */
-.edit-current-note{margin:-4px 0 18px;color:#71809b;font-size:12px;font-weight:750;padding:9px 12px;border:1px solid #dde6f2;border-radius:8px;background:#f5f8fc}
-.edit-modal .field-edited{border-color:#d5a900!important;box-shadow:0 0 0 3px rgba(255,194,0,.12)!important}
-.edit-modal .field-edited::placeholder{opacity:.65}
-body:not(.light-theme) .edit-current-note{color:#bacbea;background:rgba(255,255,255,.055);border-color:rgba(213,229,255,.18)}
-
-/* Make previous edit values easy to review and restore */
-.edit-original-value{display:block;margin-top:-3px;margin-bottom:1px;color:#7a8aa4;font-size:10px;line-height:1.35;overflow-wrap:anywhere;max-height:38px;overflow:hidden}
-.edit-modal .field-edited .edit-original-value{color:#9a7a00}
-.edit-modal [name]{transition:border-color .16s,box-shadow .16s,background .16s}
-body:not(.light-theme) .edit-original-value{color:#9fb1d2}
-body:not(.light-theme) .edit-modal .field-edited .edit-original-value{color:#f0cb55}
+/* Client testimonial recommendations */
+.testimonials-section{background:#eef3f9}.testimonial-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.testimonial-card{position:relative;min-height:330px;background:#fff;border:1px solid #dde6f1;border-radius:18px;padding:28px;display:flex;flex-direction:column;box-shadow:0 18px 45px rgba(5,29,76,.06)}.testimonial-quote-mark{position:absolute;right:24px;top:12px;color:#e1e8f1;font-family:Georgia,serif;font-size:78px}.testimonial-stars{color:#f2b700;font-size:16px;letter-spacing:3px}.testimonial-card blockquote{margin:30px 0 28px;color:#183158;font-size:16px;line-height:1.75}.testimonial-person{margin-top:auto;padding-top:18px;border-top:1px solid #edf1f6;display:flex;align-items:center;gap:12px}.testimonial-person img,.testimonial-avatar{width:48px;height:48px;border-radius:50%;object-fit:cover}.testimonial-avatar{display:grid;place-items:center;background:var(--navy);color:#fff;font-weight:850}.testimonial-person div{display:flex;flex-direction:column;gap:4px}.testimonial-person strong{font-size:13px;color:#09234f}.testimonial-person span{font-size:11px;color:#7b899e}body:not(.light-theme) .testimonials-section{background:rgba(255,255,255,.035)}body:not(.light-theme) .testimonial-card{background:linear-gradient(160deg,rgba(255,255,255,.11),rgba(255,255,255,.05));border-color:rgba(187,212,255,.14)}body:not(.light-theme) .testimonial-card blockquote{color:#e2ebfb}body:not(.light-theme) .testimonial-person{border-top-color:rgba(213,229,255,.12)}body:not(.light-theme) .testimonial-person strong{color:#fff}body:not(.light-theme) .testimonial-person span{color:#b0c1df}@media(max-width:960px){.testimonial-grid{grid-template-columns:1fr 1fr}.testimonial-card:last-child:nth-child(odd){grid-column:1/-1}}@media(max-width:700px){.testimonial-grid{grid-template-columns:1fr}.testimonial-card{min-height:270px}.testimonial-card:last-child:nth-child(odd){grid-column:auto}}

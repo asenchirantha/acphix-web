@@ -49,6 +49,9 @@ DEFAULT_SETTINGS = {
  'facebook':'', 'instagram':'', 'tiktok':'', 'behance':'',
  'pricing_notice':'Indicative starting prices in LKR. Final pricing is confirmed after a project brief and scope review.',
  'announcement':'Independent thinking. Connected execution.',
+ 'testimonial_1_name':'','testimonial_1_role':'','testimonial_1_message':'','testimonial_1_image':'','testimonial_1_rating':'5','testimonial_1_visible':'on',
+ 'testimonial_2_name':'','testimonial_2_role':'','testimonial_2_message':'','testimonial_2_image':'','testimonial_2_rating':'5','testimonial_2_visible':'on',
+ 'testimonial_3_name':'','testimonial_3_role':'','testimonial_3_message':'','testimonial_3_image':'','testimonial_3_rating':'5','testimonial_3_visible':'on',
  'stat_clients':'', 'stat_projects':'', 'stat_countries':'', 'stat_satisfaction':'', 'stat_years':'',
  'client_regions':'', 'studio_base':'Sri Lanka',
  'ambient_motion':'on',
@@ -225,6 +228,15 @@ class Handler(BaseHTTPRequestHandler):
     requests=[item(r) for r in c.execute(q,(session['id'],))]
     notes=[item(r) for r in c.execute('SELECT * FROM notifications WHERE target_user=? OR target_role=? ORDER BY created_at DESC LIMIT 80',(session['id'],session['role']))]
     return self.send_json({'requests':requests,'notifications':notes})
+   if path=='/api/admin/record':
+    if not session or session['role']!='admin':return self.error('Access denied.',403)
+    qs=parse_qs(urlparse(self.path).query)
+    kind=(qs.get('kind') or [''])[0]
+    rid=(qs.get('id') or [''])[0]
+    if kind not in ('services','portfolio','jobs','requests','applications') or not rid:return self.error('Invalid record',400)
+    row=c.execute('SELECT * FROM '+kind+' WHERE id=?',(rid,),).fetchone()
+    if not row:return self.error('Record not found',404)
+    return self.send_json({'record':item(row)})
    if path=='/api/admin':
     if not session or session['role']!='admin':return self.error('Access denied.',403)
     tables={}
@@ -299,6 +311,54 @@ class Handler(BaseHTTPRequestHandler):
      nid=clean_str(body,'id',80,True)
      c.execute('UPDATE notifications SET read_at=? WHERE id=? AND (target_role=? OR target_user=?)',(now(),nid,session['role'],session['id']))
      return self.send_json({'ok':True})
+    if path=='/api/admin' and method in ('POST','PATCH','DELETE'):
+     if not self.guard(session,'admin'):return
+     action=body.get('action','')
+     if action=='read-notification':
+      nid=clean_str(body,'id',80,True)
+      c.execute('UPDATE notifications SET read_at=? WHERE id=? AND (target_role=? OR target_user=?)',(now(),nid,session['role'],session['id']))
+      return self.send_json({'ok':True})
+     if action=='entity':
+      kind=body.pop('kind','');rid=body.pop('id','')
+      if kind not in ('services','portfolio','jobs'):raise ValueError('Invalid entity')
+      if method=='DELETE':
+       if not rid:raise ValueError('Missing id')
+       c.execute('DELETE FROM '+kind+' WHERE id=?',(rid,));return self.send_json({'ok':True})
+      if method=='POST':return self.admin_save(c,kind,body,False)
+      if method=='PATCH':return self.admin_save(c,kind,body,True)
+     if action=='settings' and method=='PATCH':
+      updates=body.get('settings')
+      if not isinstance(updates,dict):raise ValueError('Invalid settings')
+      for k,v in updates.items():
+       limit=300000 if k.endswith('_image') else 4500
+       if k not in DEFAULT_SETTINGS or not isinstance(v,str) or len(v)>limit:raise ValueError('Invalid setting '+str(k))
+       if k.endswith('_visible') and v not in ('on','off'):raise ValueError('Testimonial visibility must be on or off')
+       if k.endswith('_rating') and (not v.isdecimal() or not 1<=int(v)<=5):raise ValueError('Testimonial rating must be 1–5')
+       if k.endswith('_image') and v:
+        valid_asset=v.startswith('/assets/') and '..' not in v and not any(c.isspace() for c in v)
+        valid_https=v.startswith('https://') and len(v)>9 and not any(c.isspace() for c in v)
+        valid_upload=re.match(r'^data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$',v) is not None
+        if not (valid_asset or valid_https or valid_upload):raise ValueError('Use a trusted testimonial image URL or uploaded image')
+       c.execute
+      return self.send_json({'ok':True})
+     if action=='prices' and method=='PATCH':
+      updates=body.get('prices')
+      if not isinstance(updates,list):raise ValueError('Invalid price updates')
+      for row in updates:c.execute('UPDATE services SET starting_price=?,price_visible=?,featured_price=? WHERE id=?',(int(row['starting_price']),int(row['price_visible']),int(row['featured_price']),row['id']))
+      return self.send_json({'ok':True,'count':len(updates)})
+     if action=='request' and method=='PATCH':
+      rid=clean_str(body,'id',80,True);status=clean_str(body,'status',40,True);note=clean_str(body,'admin_note',2000)
+      if status not in ('New','Reviewing','Quoted','In Progress','Completed','Closed'):raise ValueError('Invalid status')
+      record=c.execute('SELECT user_id,status FROM requests WHERE id=?',(rid,)).fetchone()
+      if not record:return self.error('Request not found',404)
+      c.execute('UPDATE requests SET status=?,admin_note=?,updated_at=? WHERE id=?',(status,note,now(),rid))
+      if record['user_id'] and status!=record['status']:notify(c,'user','Your project request was updated',f'Your request is now {status}.','request',rid,record['user_id'])
+      return self.send_json({'ok':True})
+     if action=='application' and method=='PATCH':
+      rid=clean_str(body,'id',80,True);status=clean_str(body,'status',40,True)
+      if status not in ('New','Reviewed','Contacted','Archived'):raise ValueError('Invalid status')
+      c.execute('UPDATE applications SET status=? WHERE id=?',(status,rid));return self.send_json({'ok':True})
+     raise ValueError('Unknown admin action')
     if path.startswith('/api/admin/'):
      if not self.guard(session,'admin'):return
      route=path.removeprefix('/api/admin/')
@@ -320,7 +380,8 @@ class Handler(BaseHTTPRequestHandler):
       if not isinstance(updates,dict):raise ValueError('Invalid settings')
       allowed=set(DEFAULT_SETTINGS)
       for k,v in updates.items():
-       if k not in allowed or not isinstance(v,str) or len(v)>4500:raise ValueError('Invalid setting '+str(k))
+       limit=300000 if k.endswith('_image') else 4500
+       if k not in allowed or not isinstance(v,str) or len(v)>limit:raise ValueError('Invalid setting '+str(k))
        if k in ('facebook','instagram','tiktok','behance') and v and not re.match(r'^https://[^\s]+$',v):raise ValueError('Social links must begin with https://')
        if k in ('stat_clients','stat_projects','stat_countries','stat_years','stat_satisfaction') and v and (not v.isdecimal() or int(v)>100000000):raise ValueError('Studio metrics must be non-negative whole numbers')
        if k=='ambient_motion' and v not in ('on','off'):raise ValueError('Animation setting must be on or off')
