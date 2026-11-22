@@ -36,7 +36,7 @@ def verify_password(password, encoded):
 
 
 def migrate_sqlite(database):
-    if database.users.count_documents({}) or database.settings.count_documents({}):
+    if database.settings.count_documents({}) and database.services.count_documents({}) and database.portfolio.count_documents({}):
         return
     root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     path = os.path.join(root, "data", "acphix.sqlite3")
@@ -45,6 +45,7 @@ def migrate_sqlite(database):
     con = sqlite3.connect(path)
     con.row_factory = sqlite3.Row
     tables = {
+        "settings": "site_settings",
         "services": "services",
         "portfolio": "portfolio",
         "requests": "requests",
@@ -53,26 +54,16 @@ def migrate_sqlite(database):
         "notifications": "notifications",
         "users": "users",
     }
-    try:
-        settings = [dict(row) for row in con.execute("SELECT * FROM site_settings")]
-        if settings:
-            database.settings.delete_many({})
-            for setting in settings:
-                setting["_id"] = setting.pop("key")
-            database.settings.insert_many(settings, ordered=False)
-    except sqlite3.Error:
-        pass
     for mongo_name, sqlite_name in tables.items():
         try:
-            if mongo_name == "settings":
-                continue
             rows = [dict(row) for row in con.execute(f"SELECT * FROM {sqlite_name}")]
-            if rows:
-                for row in rows:
-                    if mongo_name == "settings":
-                        continue
-                    row["_id"] = str(row.pop("id", uuid.uuid4().hex))
-                database[mongo_name].insert_many(rows, ordered=False)
+            for row in rows:
+                key_field = "key" if mongo_name == "settings" else "id"
+                mongo_id = str(row.get(key_field) or uuid.uuid4().hex)
+                row["_id"] = mongo_id
+                if mongo_name != "settings":
+                    row.setdefault("id", mongo_id)
+                database[mongo_name].replace_one({"_id": mongo_id}, row, upsert=True)
         except sqlite3.Error:
             pass
     con.close()
