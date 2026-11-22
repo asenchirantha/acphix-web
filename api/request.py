@@ -19,8 +19,8 @@ async def create_request(request: Request):
     name = str(body.get("name", "")).strip()
     email = str(body.get("email", "")).strip().lower()
     details = str(body.get("details", "")).strip()
-    if len(name) < 2 or len(details) < 12:
-        raise HTTPException(400, "Enter a name and more project details")
+    if len(name) < 1 or len(details) < 1:
+        raise HTTPException(400, "Enter your name and project details")
     if not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", email):
         raise HTTPException(400, "Enter a valid email address")
 
