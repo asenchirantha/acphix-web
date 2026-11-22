@@ -56,6 +56,9 @@ def migrate_sqlite(database):
     try:
         settings = [dict(row) for row in con.execute("SELECT * FROM site_settings")]
         if settings:
+            database.settings.delete_many({})
+            for setting in settings:
+                setting["_id"] = setting.pop("key")
             database.settings.insert_many(settings, ordered=False)
     except sqlite3.Error:
         pass
