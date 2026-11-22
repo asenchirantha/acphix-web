@@ -204,3 +204,9 @@ body:not(.light-theme) .price-action-bar p,body:not(.light-theme) .form-hint{col
   .theme-switch{width:54px;height:34px}.theme-switch-track{width:54px;height:34px}.theme-switch-thumb{width:24px;height:24px}.theme-switch-icon{font-size:13px}.theme-switch-icon.moon{left:10px}.theme-switch-icon.sun{right:9px}body.light-theme .theme-switch-thumb{transform:translateX(20px)}
   .nav-login{display:none}
 }
+
+/* Existing-record editing cues */
+.edit-current-note{margin:-4px 0 18px;color:#71809b;font-size:12px;font-weight:750;padding:9px 12px;border:1px solid #dde6f2;border-radius:8px;background:#f5f8fc}
+.edit-modal .field-edited{border-color:#d5a900!important;box-shadow:0 0 0 3px rgba(255,194,0,.12)!important}
+.edit-modal .field-edited::placeholder{opacity:.65}
+body:not(.light-theme) .edit-current-note{color:#bacbea;background:rgba(255,255,255,.055);border-color:rgba(213,229,255,.18)}
