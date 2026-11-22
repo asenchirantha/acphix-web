@@ -1,0 +1,47 @@
+{
+  "settings": {
+    "hero_eyebrow": "INDEPENDENT CREATIVE & TECHNOLOGY STUDIO",
+    "hero_title": "Designing Innovation, Empowering Technology.",
+    "hero_subtitle": "Acphix is a Sri Lankan studio for software, design and marketing. We build the products, brands and campaigns that move your business forward.",
+    "about_title": "The magic happens between disciplines.",
+    "about_body": "Acphix is a Sri Lanka-based creative and technology studio connecting imaginative design with thoughtful engineering.",
+    "cta_title": "Have something ambitious in mind?",
+    "cta_subtitle": "Tell us the beginning. We’ll help shape what comes next.",
+    "contact_email": "acphix@gmail.com",
+    "phone": "072 207 0480",
+    "phone_secondary": "076 207 0480",
+    "location": "Sri Lanka · Working worldwide",
+    "facebook": "",
+    "instagram": "",
+    "tiktok": "",
+    "behance": "",
+    "pricing_notice": "Indicative starting prices in LKR. Final pricing is confirmed after a project brief and scope review.",
+    "announcement": "Independent thinking. Connected execution.",
+    "stat_clients": "",
+    "stat_projects": "",
+    "stat_countries": "",
+    "stat_satisfaction": "",
+    "stat_years": "",
+    "client_regions": "",
+    "studio_base": "Sri Lanka",
+    "ambient_motion": "on"
+  },
+  "services": [
+    {"id":"web-development","slug":"web-development","name":"Websites & Web Applications","category":"Development","summary":"Fast, expressive sites and robust digital platforms built around your goals.","description":"Responsive websites, dashboards, e-commerce and custom business systems.","icon":"browser","starting_price":100000,"published":1,"sort_order":1,"featured_price":1,"price_visible":1},
+    {"id":"mobile-apps","slug":"mobile-apps","name":"Mobile App Development","category":"Development","summary":"Thoughtful mobile experiences that make everyday interactions effortless.","description":"Cross-platform mobile applications, product design and API integration.","icon":"smartphone","starting_price":100000,"published":1,"sort_order":2,"featured_price":0,"price_visible":1},
+    {"id":"graphic-design","slug":"graphic-design","name":"Graphic Design","category":"Creative","summary":"Distinctive visuals that turn a good message into a memorable one.","description":"Social media creatives, print artwork, presentations and campaign assets.","icon":"pen-tool","starting_price":1500,"published":1,"sort_order":3,"featured_price":1,"price_visible":1},
+    {"id":"motion-graphics","slug":"motion-graphics","name":"Motion Graphics & Video","category":"Creative","summary":"Stories with movement, energy and purpose.","description":"Brand animations, launch videos, explainers and motion-led campaigns.","icon":"clapperboard","starting_price":2500,"published":1,"sort_order":4,"featured_price":1,"price_visible":1},
+    {"id":"brand-identity","slug":"brand-identity","name":"Branding & Identity","category":"Creative","summary":"A consistent visual and verbal world for your next chapter.","description":"Logo systems, brand guidelines, art direction and brand refreshes.","icon":"sparkles","starting_price":10000,"published":1,"sort_order":5,"featured_price":1,"price_visible":1},
+    {"id":"digital-marketing","slug":"digital-marketing","name":"Digital & Performance Marketing","category":"Growth","summary":"Creative strategy meets measurable campaigns.","description":"Campaign strategy, paid media creatives, conversion improvement and reporting.","icon":"chart-no-axes-combined","starting_price":40000,"published":1,"sort_order":6,"featured_price":1,"price_visible":1},
+    {"id":"social-media","slug":"social-media","name":"Social Media Management","category":"Growth","summary":"A brand presence built for connection, not just impressions.","description":"Channel strategy, content calendars, publishing and community workflows.","icon":"users","starting_price":40000,"published":1,"sort_order":7,"featured_price":0,"price_visible":1},
+    {"id":"content-creation","slug":"content-creation","name":"Content Creation","category":"Growth","summary":"Content with a clear point of view across formats.","description":"Copywriting, photo/video concepts, campaign content and messaging.","icon":"video","starting_price":0,"published":1,"sort_order":8,"featured_price":0,"price_visible":1},
+    {"id":"ai-automation","slug":"ai-automation","name":"AI & Workflow Automation","category":"Intelligence","summary":"Practical automations, data workflows and intelligent integrations.","description":"Less repetitive work. More room for your next big idea.","icon":"workflow","starting_price":0,"published":1,"sort_order":9,"featured_price":0,"price_visible":1},
+    {"id":"ui-ux-design","slug":"ui-ux-design","name":"UI & UX Design","category":"Creative","summary":"Interfaces that feel effortless and make an impact.","description":"User journeys, wireframes, prototypes, design systems and usability reviews.","icon":"browser","starting_price":40000,"published":1,"sort_order":10,"featured_price":1,"price_visible":1}
+  ],
+  "portfolio": [
+    {"id":"nova-digital","slug":"nova-digital","title":"NOVA / Digital Experience","category":"Web & Software","summary":"A dynamic product-first website concept exploring bold navigation and seamless interaction.","description":"A cinematic digital experience for an evolving technology story.","challenge":"Create a distinctive digital presence with clear paths to action.","solution":"A design system combining expressive visuals with purposeful navigation.","project_year":"2026","tags":"Web design, UI/UX, Concept","visual":"electric","project_type":"concept","published":1,"sort_order":1,"image_url":""},
+    {"id":"form-and-feeling","slug":"form-and-feeling","title":"FORM & FEELING","category":"Brand Identity","summary":"An expressive identity concept, built from precision, contrast and human warmth.","description":"A flexible visual system that moves with the brand.","challenge":"Create a recognisable identity across physical and digital touchpoints.","solution":"A refined typographic language, confident palette and modular assets.","project_year":"2026","tags":"Brand identity, Design system, Concept","visual":"rose","project_type":"concept","published":1,"sort_order":2,"image_url":""},
+    {"id":"signal-in-motion","slug":"signal-in-motion","title":"SIGNAL / In Motion","category":"Motion & Content","summary":"An editorial motion concept where purposeful movement gives every idea space to land.","description":"Visual storytelling that rewards attention.","challenge":"Bring a message to life without overwhelming the audience.","solution":"A motion language based on crisp transitions and a strong visual rhythm.","project_year":"2026","tags":"Motion graphics, Content, Concept","visual":"amber","project_type":"concept","published":1,"sort_order":3,"image_url":""}
+  ],
+  "jobs": []
+}
