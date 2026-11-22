@@ -31,7 +31,11 @@ async def admin(request: Request):
     for name in ("services", "portfolio", "requests", "jobs", "applications"):
         rows = list(database[name].find({}, {"_id": 0}).sort([("sort_order", 1), ("rowid", -1)])) if name not in ("requests", "applications") else list(database[name].find({}, {"_id": 0}))
         result[name] = rows
-    result["settings"] = {row["key"]: row["value"] for row in database.settings.find({}, {"_id": 0, "key": 1, "value": 1})}
+    result["settings"] = {}
+    for row in database.settings.find({}, {"_id": 1, "key": 1, "value": 1}):
+        key = row.get("key") or str(row.get("_id", ""))
+        if key:
+            result["settings"][key] = str(row.get("value", ""))
     result["notifications"] = list(database.notifications.find({"target_role": "admin"}, {"_id": 0}).sort("created_at", -1).limit(100))
     result["users_count"] = database.users.count_documents({"role": "user"})
     return result
