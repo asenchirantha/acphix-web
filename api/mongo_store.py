@@ -76,10 +76,24 @@ def get_session(database, request):
     session = database.sessions.find_one({"token_hash": hashlib.sha256(token.encode()).hexdigest()})
     if not session or session.get("expires_at", 0) <= int(time.time()):
         return None
-    user = database.users.find_one({"_id": session.get("user_id")})
+
+    user_id = session.get("user_id")
+    user = database.users.find_one({"_id": user_id})
     if not user:
-        user = database.users.find_one({"id": session.get("user_id")})
-    return {"session": session, "user": user}
+        user = database.users.find_one({"id": user_id})
+    if not user:
+        try:
+            from bson import ObjectId
+            user = database.users.find_one({"_id": ObjectId(str(user_id))})
+        except Exception:
+            pass
+    if not user:
+        try:
+            from bson import ObjectId
+            user = database.users.find_one({"_id": ObjectId(session.get("user_id"))})
+        except Exception:
+            pass
+    return {"session": session, "user": user} if user else None
 
 
 def create_session(database, user):
