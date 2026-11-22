@@ -51,7 +51,11 @@ async def settings(request: Request):
     for key, value in updates.items():
         if not isinstance(value, str) or len(value) > 4500:
             raise HTTPException(400, "Invalid setting")
-        database.settings.update_one({"key": key}, {"$set": {"key": key, "value": value}}, upsert=True)
+        database.settings.update_one(
+            {"$or": [{"key": key}, {"_id": key}]},
+            {"$set": {"key": key, "value": value}},
+            upsert=True,
+        )
     return {"ok": True}
 
 
@@ -76,6 +80,48 @@ async def prices(request: Request):
         if changed.matched_count:
             count += 1
     return {"ok": True, "count": count}
+
+
+@app.patch("/api/admin/requests")
+async def update_request(request: Request):
+    database = authorized(request)
+    body = await request.json()
+    rid = str(body.get("id", ""))
+    status = str(body.get("status", ""))
+    note = str(body.get("admin_note", ""))
+    if status not in {"New", "Reviewing", "Quoted", "In Progress", "Completed", "Closed"}:
+        raise HTTPException(400, "Invalid status")
+    changed = database.requests.update_one({"id": rid}, {"$set": {"status": status, "admin_note": note}})
+    if not changed.matched_count:
+        raise HTTPException(404, "Request not found")
+    return {"ok": True}
+
+
+@app.patch("/api/admin/applications")
+async def update_application(request: Request):
+    database = authorized(request)
+    body = await request.json()
+    aid = str(body.get("id", ""))
+    status = str(body.get("status", ""))
+    if status not in {"New", "Reviewed", "Contacted", "Archived"}:
+        raise HTTPException(400, "Invalid status")
+    changed = database.applications.update_one({"id": aid}, {"$set": {"status": status}})
+    if not changed.matched_count:
+        raise HTTPException(404, "Application not found")
+    return {"ok": True}
+
+
+@app.post("/api/notifications/read")
+async def read_notification(request: Request):
+    database = db()
+    auth = get_session(database, request)
+    if not auth:
+        raise HTTPException(401, "Please sign in")
+    body = await request.json()
+    nid = str(body.get("id", ""))
+    from datetime import datetime, timezone
+    database.notifications.update_one({"id": nid}, {"$set": {"read_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}})
+    return {"ok": True}
 
 
 @app.patch("/api/admin/{kind}")
