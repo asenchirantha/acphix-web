@@ -39,6 +39,8 @@ Admin and client users sign in through **Client login** at `/#/login`. The serve
 
 ## Admin workflow
 
+Image uploads for testimonials, client logos, and portfolio covers/gallery accept JPG, PNG, or WebP files up to 10 MB each. Images are resized and compressed in the browser before saving.
+
 1. Run `python server.py init-admin` and set your preferred admin email and password.
 2. Sign in from `/#/login` to open the **Admin Studio**.
 3. Under **Site content**, change contact details, Facebook/Instagram/TikTok/Behance URLs, homepage and about text, pricing notice and CTAs.
