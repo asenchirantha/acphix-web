@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parent
 PUBLIC = ROOT / 'public'
 DB_PATH = Path(os.environ.get('ACPHIX_DB_PATH', str(ROOT / 'data' / 'acphix.sqlite3')))
 MAX_BODY = 128 * 1024
+MAX_ADMIN_BODY = 2 * 1024 * 1024
 HOST = os.environ.get('ACPHIX_HOST', '127.0.0.1')
 PORT = int(os.environ.get('ACPHIX_PORT', '8080'))
 SITE_ORIGIN = os.environ.get('ACPHIX_PUBLIC_ORIGIN', '').rstrip('/')
@@ -52,6 +53,8 @@ DEFAULT_SETTINGS = {
  'testimonial_1_name':'','testimonial_1_role':'','testimonial_1_message':'','testimonial_1_image':'','testimonial_1_rating':'5','testimonial_1_visible':'on',
  'testimonial_2_name':'','testimonial_2_role':'','testimonial_2_message':'','testimonial_2_image':'','testimonial_2_rating':'5','testimonial_2_visible':'on',
  'testimonial_3_name':'','testimonial_3_role':'','testimonial_3_message':'','testimonial_3_image':'','testimonial_3_rating':'5','testimonial_3_visible':'on',
+ **{f'testimonial_{n}_{field}':default for n in range(4,11) for field,default in (('name',''),('role',''),('message',''),('image',''),('rating','5'),('visible','on'))},
+ **{f'client_logo_{n}_{field}':default for n in range(1,21) for field,default in (('name',''),('image',''))},
  'stat_clients':'', 'stat_projects':'', 'stat_countries':'', 'stat_satisfaction':'', 'stat_years':'',
  'client_regions':'', 'studio_base':'Sri Lanka',
  'ambient_motion':'on',
@@ -165,10 +168,10 @@ class Handler(BaseHTTPRequestHandler):
   if cookie:self.send_header('Set-Cookie',cookie)
   self.end_headers();self.wfile.write(blob)
  def error(self,msg,status=400):self.send_json({'error':msg},status)
- def read_json(self):
+ def read_json(self,max_size=MAX_BODY):
   try:l=int(self.headers.get('Content-Length','0'))
   except Exception:raise ValueError('Invalid content length')
-  if l<1 or l>MAX_BODY:raise ValueError('Request size is invalid')
+  if l<1 or l>max_size:raise ValueError('Request size is invalid')
   try:
    v=json.loads(self.rfile.read(l));assert isinstance(v,dict)
    return v
@@ -255,7 +258,7 @@ class Handler(BaseHTTPRequestHandler):
   if not path.startswith('/api/'):return self.error('Route not found',404)
   if not self.same_origin():return self.error('Invalid origin',403)
   try:
-   body={} if method=='DELETE' else self.read_json()
+   body={} if method=='DELETE' else self.read_json(MAX_ADMIN_BODY if path.startswith('/api/admin') else MAX_BODY)
    with db() as c:
     self._mut_con=c
     session=self.session(c)
@@ -338,8 +341,13 @@ class Handler(BaseHTTPRequestHandler):
         valid_asset=v.startswith('/assets/') and '..' not in v and not any(c.isspace() for c in v)
         valid_https=v.startswith('https://') and len(v)>9 and not any(c.isspace() for c in v)
         valid_upload=re.match(r'^data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$',v) is not None
-        if not (valid_asset or valid_https or valid_upload):raise ValueError('Use a trusted testimonial image URL or uploaded image')
-       c.execute
+        if not (valid_asset or valid_https or valid_upload):raise ValueError('Use a trusted HTTPS image URL, /assets/... path, or uploaded image')
+       if k in ('facebook','instagram','tiktok','behance') and v and not re.match(r'^https://[^\s]+$',v):raise ValueError('Social links must begin with https://')
+       if k in ('stat_clients','stat_projects','stat_countries','stat_years','stat_satisfaction') and v and (not v.isdecimal() or int(v)>100000000):raise ValueError('Studio metrics must be non-negative whole numbers')
+       if k=='stat_satisfaction' and v and int(v)>100:raise ValueError('Client satisfaction must be 1–100%')
+       if k=='client_regions' and len(v)>1000:raise ValueError('Too many client regions')
+       if k=='ambient_motion' and v not in ('on','off'):raise ValueError('Animation setting must be on or off')
+       c.execute('INSERT INTO site_settings (key,value) VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value',(k,v))
       return self.send_json({'ok':True})
      if action=='prices' and method=='PATCH':
       updates=body.get('prices')

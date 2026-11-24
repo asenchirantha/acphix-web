@@ -28,24 +28,26 @@ Admin and client users sign in through **Client login** at `/#/login`. The serve
 
 | Public page | Features |
 |---|---|
-| Home | Navy/gold immersive hero, pointer-responsive layered glass sculpture, always-moving frosted ambient backdrop and widgets, animated metrics, editorial portfolio photography, client-region map, services, process and curated pricing guide |
-| About | Studio positioning, manifesto, values, method |
+| Home | Navy/gold immersive hero, pointer-responsive layered glass sculpture, animated metrics, portfolio and client-region map, draggable animated client-logo rail, services, process and three-at-a-time testimonial carousel |
+| About | Studio positioning, manifesto, values, method and client testimonial carousel |
 | Services | Categories: Development, Creative, Growth, Intelligence; prices; filtering; project CTA |
 | Portfolio | Individually navigable case studies, category filtering, Next/Previous, concept/client labels |
 | Careers | Published vacancies and general talent interest form |
 | Contact | Brief intake for every service; optional budget/company/contact details |
 | User portal | Client sign-up and login, personal requests and statuses, personal notifications |
-| Admin studio | Dedicated bulk Pricing manager, request review and notes, service/pricing CRUD, portfolio CRUD with image URL, career listing CRUD, applications, CMS content, verified statistics, client countries, social links, notifications |
+| Admin studio | Dedicated bulk Pricing manager, request review and notes, service/pricing CRUD, portfolio CRUD with image URL, career listing CRUD, applications, CMS content (up to 10 testimonials and 20 client logos with uploads), verified statistics, client countries, social links, notifications |
 
 ## Admin workflow
 
 1. Run `python server.py init-admin` and set your preferred admin email and password.
 2. Sign in from `/#/login` to open the **Admin Studio**.
 3. Under **Site content**, change contact details, Facebook/Instagram/TikTok/Behance URLs, homepage and about text, pricing notice and CTAs.
-4. Under **Pricing**, edit all *starting prices* in LKR, mark each price public/hidden and choose which six (maximum) appear on the homepage. Click **Save all prices**. You can also edit service descriptions and price visibility under **Services**. Changes update the public pages immediately.
-5. Under **Portfolio**, replace the three generated, labelled concept examples with approved commissioned projects. Each entry can display a custom trusted HTTPS image or local `/assets/...` image, has its own case-study page, and can be published/unpublished individually.
-6. Under **Requests**, review enquiries, change their status and leave notes. Logged-in clients see status changes and in-app notifications.
-7. Under **Careers**, publish real openings when recruiting. Review incoming career enquiries under Applications.
+4. Under **Site content → Client testimonials**, click **Add testimonial** to add up to 10 approved recommendations. Choose ratings and visibility, and optionally upload client photos. Published cards appear three at a time in the Home and About carousels.
+5. Under **Site content → Client logos**, click **Add logo** to add up to 20 client names and upload PNG, JPG or WebP logos. Saved logos loop continuously in a slow, draggable strip after the homepage map; hover to reveal their full color.
+6. Under **Pricing**, edit service *starting prices* in LKR and choose whether each price appears publicly. Click **Save all prices**. Prices remain available on service pages; the homepage investment guide has been replaced by testimonials.
+7. Under **Portfolio**, replace the three generated, labelled concept examples with approved commissioned projects. Each entry can display a custom trusted HTTPS image or local `/assets/...` image, has its own case-study page, and can be published/unpublished individually.
+8. Under **Requests**, review enquiries, change their status and leave notes. Logged-in clients see status changes and in-app notifications.
+9. Under **Careers**, publish real openings when recruiting. Review incoming career enquiries under Applications.
 
 ## Important before a public launch
 
@@ -112,8 +114,8 @@ On first launch, prices default to selected entries from **Acphix-Rate Card 2026
 
 1. Sign in as admin and open **Pricing** in the sidebar.
 2. Enter the new `Starting price (LKR)` on any service row.
-3. Check or uncheck **Show price** (custom quote fallback) and **Feature on home**.
-4. Click **Save all prices**. The service cards and homepage pricing section update automatically.
+3. Check or uncheck **Show price** (custom quote fallback).
+4. Click **Save all prices**. Public service prices update immediately.
 
 The price controls are stored persistently in SQLite. The API is role-checked; only administrators can save. Prices set to `0` display **Custom quote** even when Show price is checked.
 

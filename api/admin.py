@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 from datetime import datetime, timezone
 
@@ -24,6 +25,22 @@ def authorized(request):
     return database
 
 
+def validated_settings(updates):
+    if not isinstance(updates, dict):
+        raise HTTPException(400, "Invalid settings")
+    for key, value in updates.items():
+        limit = 300000 if isinstance(key, str) and key.endswith("_image") else 4500
+        if not isinstance(key, str) or not isinstance(value, str) or len(value) > limit:
+            raise HTTPException(400, "Invalid setting")
+        if key.endswith("_image") and value:
+            valid_asset = value.startswith("/assets/") and ".." not in value and not any(c.isspace() for c in value)
+            valid_https = value.startswith("https://") and len(value) > 9 and not any(c.isspace() for c in value)
+            valid_upload = re.fullmatch(r"data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+", value) is not None
+            if not (valid_asset or valid_https or valid_upload):
+                raise HTTPException(400, "Use a trusted HTTPS image URL, /assets/... path, or uploaded image")
+    return updates
+
+
 @app.get("/api/admin")
 async def admin(request: Request):
     database = authorized(request)
@@ -45,12 +62,8 @@ async def admin(request: Request):
 async def settings(request: Request):
     database = authorized(request)
     body = await request.json()
-    updates = body.get("settings", {})
-    if not isinstance(updates, dict):
-        raise HTTPException(400, "Invalid settings")
+    updates = validated_settings(body.get("settings", {}))
     for key, value in updates.items():
-        if not isinstance(value, str) or len(value) > 4500:
-            raise HTTPException(400, "Invalid setting")
         database.settings.update_one(
             {"$or": [{"key": key}, {"_id": key}]},
             {"$set": {"key": key, "value": value}},
@@ -130,12 +143,8 @@ async def patch_dispatch(request: Request):
     body = await request.json()
     action = body.pop("action", "")
     if action == "settings":
-        updates = body.get("settings", {})
-        if not isinstance(updates, dict):
-            raise HTTPException(400, "Invalid settings")
+        updates = validated_settings(body.get("settings", {}))
         for key, value in updates.items():
-            if not isinstance(value, str) or len(value) > 4500:
-                raise HTTPException(400, "Invalid setting")
             database.settings.update_one({"$or": [{"key": key}, {"_id": key}]}, {"$set": {"key": key, "value": value}}, upsert=True)
         return {"ok": True}
     if action == "prices":
