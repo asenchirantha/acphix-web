@@ -14,6 +14,8 @@ PUBLIC = ROOT / 'public'
 DB_PATH = Path(os.environ.get('ACPHIX_DB_PATH', str(ROOT / 'data' / 'acphix.sqlite3')))
 MAX_BODY = 128 * 1024
 MAX_ADMIN_BODY = 2 * 1024 * 1024
+MAX_PROJECT_IMAGE_LENGTH = 200000
+MAX_PROJECT_GALLERY_IMAGES = 8
 HOST = os.environ.get('ACPHIX_HOST', '127.0.0.1')
 PORT = int(os.environ.get('ACPHIX_PORT', '8080'))
 SITE_ORIGIN = os.environ.get('ACPHIX_PUBLIC_ORIGIN', '').rstrip('/')
@@ -92,6 +94,7 @@ def init_db():
   if 'price_visible' not in cols:c.execute('ALTER TABLE services ADD COLUMN price_visible INTEGER NOT NULL DEFAULT 1')
   portfolio_cols={r['name'] for r in c.execute('PRAGMA table_info(portfolio)')}
   if 'image_url' not in portfolio_cols:c.execute("ALTER TABLE portfolio ADD COLUMN image_url TEXT NOT NULL DEFAULT ''")
+  if 'gallery' not in portfolio_cols:c.execute("ALTER TABLE portfolio ADD COLUMN gallery TEXT NOT NULL DEFAULT '[]'")
   if migrated:
    for slug in ('web-development','graphic-design','motion-graphics','brand-identity','digital-marketing','ui-ux-design'):
     c.execute('UPDATE services SET featured_price=1 WHERE slug=?',(slug,))
@@ -133,12 +136,20 @@ def create_admin(email=None):
   else: c.execute('INSERT INTO users VALUES (?,?,?,?,?,?)',(str(uuid.uuid4()),name,email,hash_password(password),'admin',now()))
  print('Admin created. Sign in at /#/login')
 
-def item(row):return dict(row)
+def item(row):
+ data=dict(row)
+ if 'gallery' in data:data['gallery']=json.loads(data['gallery'] or '[]')
+ return data
 def safe_slug(v):return re.sub('[^a-z0-9-]','',str(v).lower().strip().replace(' ','-'))[:90]
 def clean_str(data,key,limit=500,required=False):
  s=str(data.get(key,'')).strip()
  if len(s)>limit or (required and not s):raise ValueError(f'{key} is invalid')
  return s
+def valid_project_image(value):
+ if not isinstance(value,str) or len(value)>MAX_PROJECT_IMAGE_LENGTH:return False
+ return ((value.startswith('https://') and len(value)>9 and not any(c.isspace() for c in value)) or
+  (value.startswith('/assets/') and '..' not in value and not any(c.isspace() for c in value)) or
+  re.fullmatch(r'data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+',value) is not None)
 
 def notify(c,role,title,message,kind='general',related_id=None,target_user=None):
  c.execute('INSERT INTO notifications VALUES (?,?,?,?,?,?,?,?,?)',(str(uuid.uuid4()),role,target_user,kind,title,message,related_id,now(),None))
@@ -434,7 +445,7 @@ class Handler(BaseHTTPRequestHandler):
  def admin_save(self,c,table,body,update):
   allowed={
    'services':{'slug':90,'name':140,'category':70,'summary':380,'description':1600,'icon':45,'starting_price':0,'price_visible':0,'featured_price':0,'published':0,'sort_order':0},
-   'portfolio':{'slug':90,'title':160,'category':100,'summary':450,'description':1900,'challenge':1600,'solution':1600,'project_year':12,'tags':300,'visual':30,'image_url':750,'project_type':40,'published':0,'sort_order':0},
+   'portfolio':{'slug':90,'title':160,'category':100,'summary':450,'description':1900,'challenge':1600,'solution':1600,'project_year':12,'tags':300,'visual':30,'image_url':MAX_PROJECT_IMAGE_LENGTH,'project_type':40,'published':0,'sort_order':0},
    'jobs':{'title':160,'type':90,'location':160,'description':4500,'active':0},
   }[table]
   vals={}
@@ -452,10 +463,15 @@ class Handler(BaseHTTPRequestHandler):
   if table=='portfolio' and vals['project_type'] not in ('concept','client'):raise ValueError('Project type must be concept or client')
   if table=='services' and vals['starting_price']<0:raise ValueError('Price must be positive')
   if table=='services' and any(vals[k] not in (0,1) for k in ('price_visible','featured_price','published')):raise ValueError('Visibility must be on or off')
-  if table=='portfolio' and vals.get('image_url'):
-   url=vals['image_url']
-   if not ((url.startswith('https://') and len(url)>9 and not any(c.isspace() for c in url)) or (url.startswith('/assets/') and '..' not in url and not any(c.isspace() for c in url))):
-    raise ValueError('Portfolio image must be a trusted HTTPS URL or /assets/...')
+  if table=='portfolio':
+   if vals.get('image_url') and not valid_project_image(vals['image_url']):
+    raise ValueError('Portfolio cover must be a trusted HTTPS URL, /assets/... path, or uploaded image')
+   if 'gallery' in body:
+    gallery=body['gallery']
+    if not isinstance(gallery,list) or len(gallery)>MAX_PROJECT_GALLERY_IMAGES or any(not valid_project_image(image) for image in gallery):
+     raise ValueError(f'Project gallery must contain up to {MAX_PROJECT_GALLERY_IMAGES} valid images')
+    vals['gallery']=json.dumps(gallery,separators=(',',':'))
+   elif not update:vals['gallery']='[]'
 
   if update:
    rid=clean_str(body,'id',80,True)

@@ -8,6 +8,8 @@ from fastapi import FastAPI, HTTPException, Request
 from mongo_store import db, get_session
 
 app = FastAPI()
+MAX_PROJECT_IMAGE_LENGTH = 200000
+MAX_PROJECT_GALLERY_IMAGES = 8
 
 
 def public(row):
@@ -39,6 +41,28 @@ def validated_settings(updates):
             if not (valid_asset or valid_https or valid_upload):
                 raise HTTPException(400, "Use a trusted HTTPS image URL, /assets/... path, or uploaded image")
     return updates
+
+
+def valid_project_image(value):
+    if not isinstance(value, str) or len(value) > MAX_PROJECT_IMAGE_LENGTH:
+        return False
+    valid_asset = value.startswith("/assets/") and ".." not in value and not any(c.isspace() for c in value)
+    valid_https = value.startswith("https://") and len(value) > 9 and not any(c.isspace() for c in value)
+    valid_upload = re.fullmatch(r"data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+", value) is not None
+    return valid_asset or valid_https or valid_upload
+
+
+def validate_portfolio_images(kind, body):
+    if kind != "portfolio":
+        return
+    if "image_url" in body and body["image_url"] and not valid_project_image(body["image_url"]):
+        raise HTTPException(400, "Portfolio cover must be a trusted HTTPS URL, /assets/... path, or uploaded image")
+    if "gallery" in body:
+        gallery = body["gallery"]
+        if not isinstance(gallery, list) or len(gallery) > MAX_PROJECT_GALLERY_IMAGES or any(
+            not valid_project_image(image) for image in gallery
+        ):
+            raise HTTPException(400, f"Project gallery must contain up to {MAX_PROJECT_GALLERY_IMAGES} valid images")
 
 
 @app.get("/api/admin")
@@ -179,6 +203,7 @@ async def patch_dispatch(request: Request):
         rid = body.pop("id", "")
         if kind not in ("services", "portfolio", "jobs") or not rid:
             raise HTTPException(400, "Invalid entity")
+        validate_portfolio_images(kind, body)
         changed = database[kind].update_one({"id": rid}, {"$set": body})
         if not changed.matched_count:
             raise HTTPException(404, "Record not found")
@@ -195,6 +220,7 @@ async def patch_entity(kind: str, request: Request):
     rid = body.pop("id", "")
     if not rid:
         raise HTTPException(400, "Missing id")
+    validate_portfolio_images(kind, body)
     changed = database[kind].update_one({"id": rid}, {"$set": body})
     if not changed.matched_count:
         raise HTTPException(404, "Record not found")
@@ -216,6 +242,7 @@ async def post_dispatch(request: Request):
         if kind not in ("services", "portfolio", "jobs"):
             raise HTTPException(400, "Invalid entity")
         body.pop("id", None)
+        validate_portfolio_images(kind, body)
         import os
         body["id"] = body.get("slug") or body.get("title") or os.urandom(8).hex()
         database[kind].insert_one(body)
@@ -230,6 +257,7 @@ async def create_entity(kind: str, request: Request):
     database = authorized(request)
     body = await request.json()
     body.pop("id", None)
+    validate_portfolio_images(kind, body)
     body["id"] = body.get("slug") or body.get("title") or os.urandom(8).hex()
     database[kind].insert_one(body)
     return {"ok": True, "id": body["id"]}
