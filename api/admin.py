@@ -2,6 +2,7 @@ import os
 import re
 import sys
 from datetime import datetime, timezone
+from urllib.parse import urlparse
 
 sys.path.insert(0, os.path.dirname(__file__))
 from fastapi import FastAPI, HTTPException, Request
@@ -52,11 +53,29 @@ def valid_project_image(value):
     return valid_asset or valid_https or valid_upload
 
 
-def validate_portfolio_images(kind, body):
+def valid_project_link(value):
+    if not isinstance(value, str) or len(value) > 2048 or any(char.isspace() for char in value):
+        return False
+    try:
+        parsed = urlparse(value)
+        _ = parsed.port
+    except ValueError:
+        return False
+    return parsed.scheme == "https" and bool(parsed.hostname)
+
+
+def validate_portfolio(kind, body):
     if kind != "portfolio":
         return
-    if "image_url" in body and body["image_url"] and not valid_project_image(body["image_url"]):
-        raise HTTPException(400, "Portfolio cover must be a trusted HTTPS URL, /assets/... path, or uploaded image")
+    for field, label in (("image_url", "Portfolio cover"), ("mark_url", "Project logo overlay")):
+        if field in body and body[field] and not valid_project_image(body[field]):
+            raise HTTPException(400, f"{label} must be a trusted HTTPS URL, /assets/... path, or uploaded image")
+    for field, limit in (("industry", 120), ("client", 160), ("introduction", 5000), ("project_url", 2048)):
+        value = body.get(field, "")
+        if not isinstance(value, str) or len(value) > limit:
+            raise HTTPException(400, f"Invalid portfolio field: {field}")
+    if body.get("project_url") and not valid_project_link(body["project_url"]):
+        raise HTTPException(400, "Project URL must be a valid HTTPS URL")
     if "gallery" in body:
         gallery = body["gallery"]
         if not isinstance(gallery, list) or len(gallery) > MAX_PROJECT_GALLERY_IMAGES or any(
@@ -203,7 +222,7 @@ async def patch_dispatch(request: Request):
         rid = body.pop("id", "")
         if kind not in ("services", "portfolio", "jobs") or not rid:
             raise HTTPException(400, "Invalid entity")
-        validate_portfolio_images(kind, body)
+        validate_portfolio(kind, body)
         changed = database[kind].update_one({"id": rid}, {"$set": body})
         if not changed.matched_count:
             raise HTTPException(404, "Record not found")
@@ -220,7 +239,7 @@ async def patch_entity(kind: str, request: Request):
     rid = body.pop("id", "")
     if not rid:
         raise HTTPException(400, "Missing id")
-    validate_portfolio_images(kind, body)
+    validate_portfolio(kind, body)
     changed = database[kind].update_one({"id": rid}, {"$set": body})
     if not changed.matched_count:
         raise HTTPException(404, "Record not found")
@@ -242,7 +261,7 @@ async def post_dispatch(request: Request):
         if kind not in ("services", "portfolio", "jobs"):
             raise HTTPException(400, "Invalid entity")
         body.pop("id", None)
-        validate_portfolio_images(kind, body)
+        validate_portfolio(kind, body)
         import os
         body["id"] = body.get("slug") or body.get("title") or os.urandom(8).hex()
         database[kind].insert_one(body)
@@ -257,7 +276,7 @@ async def create_entity(kind: str, request: Request):
     database = authorized(request)
     body = await request.json()
     body.pop("id", None)
-    validate_portfolio_images(kind, body)
+    validate_portfolio(kind, body)
     body["id"] = body.get("slug") or body.get("title") or os.urandom(8).hex()
     database[kind].insert_one(body)
     return {"ok": True, "id": body["id"]}

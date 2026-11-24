@@ -95,6 +95,8 @@ def init_db():
   portfolio_cols={r['name'] for r in c.execute('PRAGMA table_info(portfolio)')}
   if 'image_url' not in portfolio_cols:c.execute("ALTER TABLE portfolio ADD COLUMN image_url TEXT NOT NULL DEFAULT ''")
   if 'gallery' not in portfolio_cols:c.execute("ALTER TABLE portfolio ADD COLUMN gallery TEXT NOT NULL DEFAULT '[]'")
+  for name in ('mark_url','industry','client','introduction','project_url'):
+   if name not in portfolio_cols:c.execute(f"ALTER TABLE portfolio ADD COLUMN {name} TEXT NOT NULL DEFAULT ''")
   if migrated:
    for slug in ('web-development','graphic-design','motion-graphics','brand-identity','digital-marketing','ui-ux-design'):
     c.execute('UPDATE services SET featured_price=1 WHERE slug=?',(slug,))
@@ -150,6 +152,13 @@ def valid_project_image(value):
  return ((value.startswith('https://') and len(value)>9 and not any(c.isspace() for c in value)) or
   (value.startswith('/assets/') and '..' not in value and not any(c.isspace() for c in value)) or
   re.fullmatch(r'data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+',value) is not None)
+def valid_project_link(value):
+ if not isinstance(value,str) or len(value)>2048 or any(c.isspace() for c in value):return False
+ try:
+  parsed=urlparse(value)
+  _=parsed.port
+ except ValueError:return False
+ return parsed.scheme=='https' and bool(parsed.hostname)
 
 def notify(c,role,title,message,kind='general',related_id=None,target_user=None):
  c.execute('INSERT INTO notifications VALUES (?,?,?,?,?,?,?,?,?)',(str(uuid.uuid4()),role,target_user,kind,title,message,related_id,now(),None))
@@ -339,7 +348,9 @@ class Handler(BaseHTTPRequestHandler):
        if not rid:raise ValueError('Missing id')
        c.execute('DELETE FROM '+kind+' WHERE id=?',(rid,));return self.send_json({'ok':True})
       if method=='POST':return self.admin_save(c,kind,body,False)
-      if method=='PATCH':return self.admin_save(c,kind,body,True)
+      if method=='PATCH':
+       body['id']=rid
+       return self.admin_save(c,kind,body,True)
      if action=='settings' and method=='PATCH':
       updates=body.get('settings')
       if not isinstance(updates,dict):raise ValueError('Invalid settings')
@@ -445,7 +456,7 @@ class Handler(BaseHTTPRequestHandler):
  def admin_save(self,c,table,body,update):
   allowed={
    'services':{'slug':90,'name':140,'category':70,'summary':380,'description':1600,'icon':45,'starting_price':0,'price_visible':0,'featured_price':0,'published':0,'sort_order':0},
-   'portfolio':{'slug':90,'title':160,'category':100,'summary':450,'description':1900,'challenge':1600,'solution':1600,'project_year':12,'tags':300,'visual':30,'image_url':MAX_PROJECT_IMAGE_LENGTH,'project_type':40,'published':0,'sort_order':0},
+   'portfolio':{'slug':90,'title':160,'category':100,'summary':450,'description':1900,'introduction':5000,'challenge':1600,'solution':1600,'project_year':12,'industry':120,'client':160,'project_url':2048,'tags':300,'visual':30,'image_url':MAX_PROJECT_IMAGE_LENGTH,'mark_url':MAX_PROJECT_IMAGE_LENGTH,'project_type':40,'published':0,'sort_order':0},
    'jobs':{'title':160,'type':90,'location':160,'description':4500,'active':0},
   }[table]
   vals={}
@@ -464,8 +475,11 @@ class Handler(BaseHTTPRequestHandler):
   if table=='services' and vals['starting_price']<0:raise ValueError('Price must be positive')
   if table=='services' and any(vals[k] not in (0,1) for k in ('price_visible','featured_price','published')):raise ValueError('Visibility must be on or off')
   if table=='portfolio':
-   if vals.get('image_url') and not valid_project_image(vals['image_url']):
-    raise ValueError('Portfolio cover must be a trusted HTTPS URL, /assets/... path, or uploaded image')
+   for key,label in (('image_url','Portfolio cover'),('mark_url','Project logo overlay')):
+    if vals.get(key) and not valid_project_image(vals[key]):
+     raise ValueError(f'{label} must be a trusted HTTPS URL, /assets/... path, or uploaded image')
+   if vals.get('project_url') and not valid_project_link(vals['project_url']):
+    raise ValueError('Project URL must be a valid HTTPS URL')
    if 'gallery' in body:
     gallery=body['gallery']
     if not isinstance(gallery,list) or len(gallery)>MAX_PROJECT_GALLERY_IMAGES or any(not valid_project_image(image) for image in gallery):

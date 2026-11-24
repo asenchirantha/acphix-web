@@ -28,14 +28,14 @@ Admin and client users sign in through **Client login** at `/#/login`. The serve
 
 | Public page | Features |
 |---|---|
-| Home | Navy/gold immersive hero, pointer-responsive layered glass sculpture, animated metrics, portfolio and client-region map, seamless client-logo marquee, services, process and three-at-a-time testimonial carousel |
+| Home | Navy/gold immersive hero, pointer-responsive layered glass sculpture, animated metrics, portfolio and client-region map, seamless client-logo marquee, asymmetric cover-first portfolio bento, services, process and three-at-a-time testimonial carousel |
 | About | Studio positioning, manifesto, values, method and client testimonial carousel |
 | Services | Categories: Development, Creative, Growth, Intelligence; prices; filtering; project CTA |
 | Portfolio | Asymmetric image-led project mosaic, category filtering, individual case studies with cover images and galleries, concept/client labels |
 | Careers | Published vacancies and general talent interest form |
 | Contact | Brief intake for every service; optional budget/company/contact details |
 | User portal | Client sign-up and login, personal requests and statuses, personal notifications |
-| Admin studio | Dedicated bulk Pricing manager, request review and notes, service/pricing CRUD, portfolio CRUD with cover and gallery image uploads, career listing CRUD, applications, CMS content (up to 10 testimonials and 20 client logos with uploads), verified statistics, client countries, social links, notifications |
+| Admin studio | Dedicated bulk Pricing manager, request review and notes, service/pricing CRUD, portfolio CRUD with covers, logo marks, case-study metadata, and gallery URLs or uploads, career listing CRUD, applications, CMS content (up to 10 testimonials and 20 client logos with uploads), verified statistics, client countries, social links, notifications |
 
 ## Admin workflow
 
@@ -45,7 +45,7 @@ Admin and client users sign in through **Client login** at `/#/login`. The serve
 4. Under **Site content → Client testimonials**, click **Add testimonial** to add up to 10 approved recommendations. Choose ratings and visibility, and optionally upload client photos. Published cards appear three at a time in the Home and About carousels.
 5. Under **Site content → Client logos**, click **Add logo** to add up to 20 client names and upload PNG, JPG or WebP logos. Saved logos loop continuously in a slow, draggable strip after the homepage map; hover to pause and reveal their full color. The marquee respects reduced-motion preferences and the admin ambient-motion setting.
 6. Under **Pricing**, edit service *starting prices* in LKR and choose whether each price appears publicly. Click **Save all prices**. Prices remain available on service pages; the homepage investment guide has been replaced by testimonials.
-7. Under **Portfolio**, replace the three generated, labelled concept examples with approved commissioned projects. Upload a cover image and up to eight supporting gallery images, or use a trusted HTTPS / local `/assets/...` cover URL. Each entry has its own image-led case-study page and can be published/unpublished individually.
+7. Under **Portfolio**, replace the three generated, labelled concept examples with approved commissioned projects. Add a cover and optional centered logo mark; enter the year, industry/client, introduction, challenge, approach, and optional live project URL. Add up to eight gallery images using trusted HTTPS or local `/assets/...` URLs and/or image uploads. Each entry has its own editorial case-study page and can be published/unpublished individually.
 8. Under **Requests**, review enquiries, change their status and leave notes. Logged-in clients see status changes and in-app notifications.
 9. Under **Careers**, publish real openings when recruiting. Review incoming career enquiries under Applications.
 
