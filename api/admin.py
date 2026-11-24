@@ -299,13 +299,23 @@ async def delete_dispatch(request: Request):
 
 @app.delete("/api/admin/{kind}")
 async def delete_entity(kind: str, request: Request):
-    if kind not in ("services", "portfolio", "jobs"):
+    if kind not in ("services", "portfolio", "jobs", "requests", "notifications"):
         raise HTTPException(404, "API route not found")
     database = authorized(request)
     rid = request.query_params.get("id", "")
     if not rid:
         raise HTTPException(400, "Missing id")
-    database[kind].delete_one({"id": rid})
+    if kind == "requests":
+        changed = database.requests.delete_one({"id": rid})
+        if not changed.deleted_count:
+            raise HTTPException(404, "Request not found")
+        database.notifications.delete_many({"kind": "request", "related_id": rid})
+    elif kind == "notifications":
+        changed = database.notifications.delete_one({"id": rid, "target_role": "admin"})
+        if not changed.deleted_count:
+            raise HTTPException(404, "Notification not found")
+    else:
+        database[kind].delete_one({"id": rid})
     return {"ok": True}
 
 

@@ -438,6 +438,17 @@ class Handler(BaseHTTPRequestHandler):
       c.execute('UPDATE requests SET status=?,admin_note=?,updated_at=? WHERE id=?',(status,note,now(),rid))
       if record['user_id'] and status!=record['status']:notify(c,'user','Your project request was updated',f'Your request is now {status}.','request',rid,record['user_id'])
       return self.send_json({'ok':True})
+     if route in ('requests','notifications') and method=='DELETE':
+      qs=parse_qs(urlparse(self.path).query);rid=(qs.get('id') or [''])[0]
+      if not rid:return self.error('Missing id',400)
+      if route=='requests':
+       cur=c.execute('DELETE FROM requests WHERE id=?',(rid,))
+       if cur.rowcount!=1:return self.error('Request not found',404)
+       c.execute("DELETE FROM notifications WHERE kind='request' AND related_id=?",(rid,))
+      else:
+       cur=c.execute("DELETE FROM notifications WHERE id=? AND target_role='admin'",(rid,))
+       if cur.rowcount!=1:return self.error('Notification not found',404)
+      return self.send_json({'ok':True})
      if route=='applications' and method=='PATCH':
       rid=clean_str(body,'id',80,True);status=clean_str(body,'status',40,True)
       if status not in ('New','Reviewed','Contacted','Archived'):raise ValueError('Invalid status')

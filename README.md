@@ -48,7 +48,7 @@ Image uploads for testimonials, client logos, and portfolio covers/gallery accep
 5. Under **Site content → Client logos**, click **Add logo** to add up to 20 client names and upload PNG, JPG or WebP logos. Saved logos loop continuously in a slow, draggable strip after the homepage map; hover to pause and reveal their full color. The marquee respects reduced-motion preferences and the admin ambient-motion setting.
 6. Under **Pricing**, edit service *starting prices* in LKR and choose whether each price appears publicly. Click **Save all prices**. Prices remain available on service pages; the homepage investment guide has been replaced by testimonials.
 7. Under **Portfolio**, replace the three generated, labelled concept examples with approved commissioned projects. Add a cover and optional centered logo mark; enter the year, industry/client, introduction, challenge, approach, and optional live project URL. Add up to eight gallery images using trusted HTTPS or local `/assets/...` URLs and/or image uploads. Each entry has its own editorial case-study page and can be published/unpublished individually.
-8. Under **Requests**, review enquiries, change their status and leave notes. Logged-in clients see status changes and in-app notifications.
+8. Under **Requests**, review enquiries, change their status and leave notes. Permanently delete a request only after confirming; deletion also clears its linked notifications and cannot be undone. Admin notifications can be deleted individually. Logged-in clients see status changes and in-app notifications.
 9. Under **Careers**, publish real openings when recruiting. Review incoming career enquiries under Applications.
 
 ## Important before a public launch
